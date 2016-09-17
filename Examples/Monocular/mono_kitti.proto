@@ -1,0 +1,98 @@
+// Copyright 2015, Google Inc.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.mono_kitti";
+option java_outer_classname = "MonoKitti";
+option objc_class_prefix = "KIT";
+
+package mono_kitti;
+
+service OrbSLAM {
+
+	rpc NewSLAM(NewSLAMRequest) returns (NewSLAMReturn) {}; 
+
+	rpc TrackMonocular(TrackMonocularRequest) returns (TrackMonocularReturn) {}; 
+
+	rpc Shutdown(ShutdownRequest) returns (ShutdownReturn) {};
+
+	rpc SaveKeyFrameTrajectoryTUM(SaveKeyFrameTrajectoryTUMRequest) returns (SaveKeyFrameTrajectoryTUMReturn) {};
+
+}
+
+message NewSLAMRequest {
+	string strVocFile = 1;
+	string strSettingFile = 2;
+	enum ESensor {
+	        ROS = 0;
+		RGBD = 1;
+		STEREO = 2;
+		MONOCULAR = 3;
+	}
+	ESensor sensor = 3;
+	bool bUseViewer = 4;  
+}
+
+message NewSLAMReturn {
+	bool success = 1;
+}
+
+message TrackMonocularRequest {
+	bytes im = 1;
+	int32 im_height = 2;
+	int32 im_width = 3;
+	int32 im_channel = 4;
+	int32 im_type = 5;
+	double timestamp = 6;
+}
+
+message TrackMonocularReturn {
+	bytes im = 1;
+	int32 im_height = 2;
+	int32 im_width = 3;
+	int32 im_channel = 4;
+	int32 im_type = 5;
+}
+
+message ShutdownRequest {
+}
+
+message ShutdownReturn {
+	bool success = 1;
+}
+
+message SaveKeyFrameTrajectoryTUMRequest {
+	string filename = 1;
+}
+
+message SaveKeyFrameTrajectoryTUMReturn {
+	bool success = 1;
+}
