@@ -33,6 +33,8 @@ find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 
 include_directories(
+/usr/local/include/grpc
+/usr/local/include/grpc++
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
 ${EIGEN3_INCLUDE_DIR}
@@ -61,6 +63,8 @@ src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
 src/Initializer.cc
 src/Viewer.cc
+Examples/Monocular/mono_kitti.pb.cc
+Examples/Monocular/mono_kitti.grpc.pb.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -69,6 +73,9 @@ ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+/usr/local/lib/libgrpc.so
+/usr/local/lib/libgrpc++.so
+/usr/local/lib/libprotobuf.so
 )
 
 # Build examples
@@ -95,9 +102,9 @@ add_executable(mono_kitti
 Examples/Monocular/mono_kitti.cc)
 target_link_libraries(mono_kitti ${PROJECT_NAME})
 
-#add_executable(mono_kitti_server
-#Examples/Monocular/mono_kitti_server.cc)
-#target_link_libraries(mono_kitti_server ${PROJECT_NAME})
+add_executable(mono_kitti_server
+Examples/Monocular/mono_kitti_server.cc)
+target_link_libraries(mono_kitti_server ${PROJECT_NAME})
 
 add_executable(mono_kitti_client
 Examples/Monocular/mono_kitti_client.cc)
