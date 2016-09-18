@@ -71,7 +71,11 @@ class OrbSLAMClient {
 	cv::Size size = im.size();
 	std::vector<uchar> data(im.ptr(), im.ptr() + size.width * size.height* im.channels());
 	std::string image(data.begin(), data.end());	
-  	TrackMonocularRequest request;
+  	//uchar *data;
+	//data = new uchar[size.width * size.height * im.channels()];
+	//memcpy(data, im.ptr(), sizeof(uchar)*size.width * size.height * im.channels());
+	//std::string iamge(data, data+ size.width * size.height * im.channels(), im.ptr() );
+	TrackMonocularRequest request;
 	request.set_im(image);
 	request.set_im_width(size.width);
 	request.set_im_height(size.height);

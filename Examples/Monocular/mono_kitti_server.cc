@@ -77,9 +77,14 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
   Status TrackMonocular(ServerContext* context, const TrackMonocularRequest* request, TrackMonocularReturn* reply) override {
 	// de-serialize cv::mat
 	std::string im = request->im();
+	//std::vector<uchar> data(im.ptr(), im.ptr() + request->im_height() * request->im_width() * request->channels());
+	std::vector<uchar> im_data(im.begin(), im.end());
 	char *data_send;
-	data_send = new char[request->im_width() * request->im_height() *request->im_channel() ];	
-	strcpy(data_send, im.c_str());
+	data_send = new char[ im_data.size()];	
+	std::copy(im_data.begin(), im_data.end(), data_send);
+	//strcpy(data_send, data_image.c_str());
+	//data_send = new char[request->im_width() * request->im_height() *request->im_channel() ];	
+	//strcpy(data_send, im.c_str());
 	cv::Mat image(request->im_height(), request->im_width(), request->im_type(), data_send);
        	cv::imshow("ORB-SLAM2: Current Frame",image); // for debug
         cv::waitKey(1e5/30);
