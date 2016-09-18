@@ -63,11 +63,11 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
 	//char *strsettingfile_cstr = new char[300];
 	//char *strvocfile_cstr = new char[300];
 	//strcpy(str)
-	if ( request->sensor() == 3  ) {
+	if ( request->sensor() == mono_kitti::NewSLAMRequest_ESensor::NewSLAMRequest_ESensor_MONOCULAR   ) {
 		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::MONOCULAR, request->buseviewer());
-	} else if ( request->sensor() == 1) {
+	} else if ( request->sensor() == mono_kitti::NewSLAMRequest_ESensor::NewSLAMRequest_ESensor_RGBD ) {
 		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::RGBD, request->buseviewer());
-	} else if ( request->sensor() == 2) {
+	} else if ( request->sensor() == mono_kitti::NewSLAMRequest_ESensor::NewSLAMRequest_ESensor_STEREO ) {
 		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::STEREO, request->buseviewer());
 	}
 	reply->set_success(true);
@@ -80,9 +80,11 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
 	char *data_send;
 	data_send = new char[request->im_width() * request->im_height() *request->im_channel() ];	
 	strcpy(data_send, im.c_str());
-	cv::Mat image(request->im_width(), request->im_height(), request->im_type(), data_send);	
-	cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
+	cv::Mat image(request->im_height(), request->im_width(), request->im_type(), data_send);
+       	cv::imshow("ORB-SLAM2: Current Frame",image); // for debug
+        cv::waitKey(1e5/30);
 
+	cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
 	// serialize cv::mat
 	cv::Size size = ret.size();
 	std::vector<uchar> data(ret.ptr(), ret.ptr() + size.width * size.height* ret.channels());

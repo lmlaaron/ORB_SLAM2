@@ -86,9 +86,9 @@ class OrbSLAMClient {
 	char *data_recv;
 	data_recv = new char[reply.im_width() * reply.im_height() * reply.im_channel()];	
 	strcpy(data_recv, reply.im().c_str());
-	
+		
 	//cv::Mat ret(reply.im_width(), reply.im_height(), reply.im_type(), ((string) (reply.im())) );	
-	cv::Mat ret(reply.im_width(), reply.im_height(), reply.im_type(), data_recv );	
+	cv::Mat ret(reply.im_height(), reply.im_width(), reply.im_type(), data_recv );	
 	return ret;
   }
   void Shutdown() {
@@ -133,6 +133,7 @@ int main(int argc, char **argv)
 	grpc::CreateChannel("localhost:50051",
 			grpc::InsecureChannelCredentials())
     );
+    SLAM.NewSLAM(argv[1], argv[2], mono_kitti::NewSLAMRequest_ESensor::NewSLAMRequest_ESensor_MONOCULAR, true);
 
  // this should be replaced by some constructive function
 	// before that, the client should be connected to the grpc server
@@ -167,7 +168,7 @@ int main(int argc, char **argv)
 #endif
 
         // Pass the image to the SLAM system
-        SLAM.TrackMonocular(im,tframe); 	// this is a grpc call
+	SLAM.TrackMonocular(im,tframe); 	// this is a grpc call
 						// a new tpye of grpc call might be required to return the trajectory the previous
 
 #ifdef COMPILEDWITHC11
