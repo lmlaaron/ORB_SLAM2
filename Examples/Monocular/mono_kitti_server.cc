@@ -29,6 +29,11 @@
 #include <opencv2/opencv.hpp>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
+#include <grpc/grpc.h>
+#include <grpc++/server.h>
+#include <grpc++/server_builder.h>
+#include <grpc++/server_context.h>
+#include <grpc++/security/server_credentials.h>
 
 #include"System.h"
 #include "mono_kitti.grpc.pb.h"
@@ -51,8 +56,20 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
  private:
   ORB_SLAM2::System* SLAM;
  public:
+  explicit OrbSLAMServiceImpl() {
+	SLAM = NULL;
+  }
   Status NewSLAM(ServerContext* context,const NewSLAMRequest* request, NewSLAMReturn* reply) override {
-	SLAM = new System((request->strvocfile()).c_str(), (request->strsettingfile).c_str(), request->sensor(), request->busviewer());
+	//char *strsettingfile_cstr = new char[300];
+	//char *strvocfile_cstr = new char[300];
+	//strcpy(str)
+	if ( request->sensor() == 3  ) {
+		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::MONOCULAR, request->buseviewer());
+	} else if ( request->sensor() == 1) {
+		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::RGBD, request->buseviewer());
+	} else if ( request->sensor() == 2) {
+		SLAM = new ORB_SLAM2::System((request->strvocfile()), (request->strsettingfile()), ORB_SLAM2::System::eSensor::STEREO, request->buseviewer());
+	}
 	reply->set_success(true);
 	return Status::OK;
 	}; 
@@ -60,24 +77,26 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
   Status TrackMonocular(ServerContext* context, const TrackMonocularRequest* request, TrackMonocularReturn* reply) override {
 	// de-serialize cv::mat
 	std::string im = request->im();
-	cv::Mat image(request->im_width(), request->im_height(), request->im_type(), im.c_str());	
-	ret = SLAM->TrackMonocular(image, request->timestamp()); 
+	char *data_send;
+	data_send = new char[request->im_width() * request->im_height() *request->im_channel() ];	
+	strcpy(data_send, im.c_str());
+	cv::Mat image(request->im_width(), request->im_height(), request->im_type(), data_send);	
+	cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
 
 	// serialize cv::mat
 	cv::Size size = ret.size();
-	std::vector<uchar> data(im.ptr(), ret.ptr() + size.width * size.height* ret.channels());
-	std::string image(data.begin(), date.end());	
-  	TrackMonocularRequest request;
-	reply.set_im(image);
-	reply.set_im_width(size.width);
-	reply.set_im_height(size.height);
-	reply.set_im_channel(ret.channels());
-	reply.set_im_type(ret.type());
+	std::vector<uchar> data(ret.ptr(), ret.ptr() + size.width * size.height* ret.channels());
+	std::string ret_image(data.begin(), data.end());	
+	reply->set_im(ret_image);
+	reply->set_im_width(size.width);
+	reply->set_im_height(size.height);
+	reply->set_im_channel(ret.channels());
+	reply->set_im_type(ret.type());
 		
   	return Status::OK;
   }; 
   Status Shutdown(ServerContext* context, const ShutdownRequest* request, ShutdownReturn* reply) override {
-	SLAM->shutdown();
+	SLAM->Shutdown();
 	reply->set_success(true);
   	return Status::OK;
   };
@@ -88,7 +107,7 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
 	reply->set_success(true);
 	return Status::OK;
   };
-}
+};
 
 
 void RunServer() {
