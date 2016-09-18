@@ -53,7 +53,6 @@ void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
 
 class OrbSLAMClient {
  public:
-<<<<<<< HEAD
   OrbSLAMClient(std::shared_ptr<Channel> channel) : stub_(OrbSLAM::NewStub(channel)) {};
   
   void NewSLAM(const string &strVocFile, const string &strSettingsFile, const mono_kitti::NewSLAMRequest_ESensor sensor, const bool bUseViewer) {
