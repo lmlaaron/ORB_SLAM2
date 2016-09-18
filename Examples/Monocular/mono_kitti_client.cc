@@ -24,15 +24,89 @@
 #include<fstream>
 #include<chrono>
 #include<iomanip>
-
+#include <grpc++/grpc++.h>
 #include<opencv2/core/core.hpp>
+
+#include "mono_kitti.grpc.pb.h"
 
 #include"System.h"
 
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+using mono_kitti::OrbSLAM;
+using mono_kitti::NewSLAMRequest;
+using mono_kitti::NewSLAMReturn;
+using mono_kitti::SaveKeyFrameTrajectoryTUMRequest;
+using mono_kitti::SaveKeyFrameTrajectoryTUMReturn;
+using mono_kitti::ShutdownRequest;
+using mono_kitti::ShutdownReturn;
+using mono_kitti::TrackMonocularRequest;
+using mono_kitti::TrackMonocularReturn;
 using namespace std;
+
+//enum ESensor { ROS = 0, RGBD = 1, STEREO = 2, MONOCULAR = 3};
 
 void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
                 vector<double> &vTimestamps);
+
+class OrbSLAMClient {
+ public:
+  OrbSLAMClient(std::shared_ptr<Channel> channel) : stub_(OrbSLAM::NewStub(channel)) {};
+  
+  void NewSLAM(const string &strVocFile, const string &strSettingsFile, const mono_kitti::NewSLAMRequest_ESensor sensor, const bool bUseViewer) {
+
+	NewSLAMRequest request;
+	request.set_strvocfile(strVocFile);
+	request.set_strsettingfile(strSettingsFile);
+	request.set_sensor(sensor);
+	request.set_buseviewer(bUseViewer);
+	NewSLAMReturn reply;
+  	ClientContext context;
+  	stub_->NewSLAM(&context, request, &reply);
+  }
+  cv::Mat TrackMonocular(const cv::Mat &im, const double &timestamp) {
+	// serialize cv::mat
+	cv::Size size = im.size();
+	std::vector<uchar> data(im.ptr(), im.ptr() + size.width * size.height* im.channels());
+	std::string image(data.begin(), data.end());	
+  	TrackMonocularRequest request;
+	request.set_im(image);
+	request.set_im_width(size.width);
+	request.set_im_height(size.height);
+	request.set_im_channel(im.channels());
+	request.set_im_type(im.type());
+	TrackMonocularReturn reply;
+ 	ClientContext context;
+	
+	stub_->TrackMonocular(&context, request, &reply);
+
+	// deserialize cv::mat
+	char *data_recv;
+	data_recv = new char[reply.im_width() * reply.im_height() * reply.im_channel()];	
+	strcpy(data_recv, reply.im().c_str());
+	
+	//cv::Mat ret(reply.im_width(), reply.im_height(), reply.im_type(), ((string) (reply.im())) );	
+	cv::Mat ret(reply.im_width(), reply.im_height(), reply.im_type(), data_recv );	
+	return ret;
+  }
+  void Shutdown() {
+  	ShutdownRequest request;
+	ShutdownReturn reply;
+	ClientContext context;
+	stub_->Shutdown(&context, request, &reply);
+  }
+  void SaveKeyFrameTrajectoryTUM(const string &filename) {
+  	SaveKeyFrameTrajectoryTUMRequest request;
+	request.set_filename(filename);
+	SaveKeyFrameTrajectoryTUMReturn reply;
+        ClientContext context;
+	stub_->SaveKeyFrameTrajectoryTUM(&context, request, &reply);
+  }
+ private:
+  std::unique_ptr<OrbSLAM::Stub> stub_;
+};
+
 
 int main(int argc, char **argv)
 {
@@ -53,7 +127,15 @@ int main(int argc, char **argv)
     int nImages = vstrImageFilenames.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
+    //ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
+    OrbSLAMClient SLAM(
+	grpc::CreateChannel("localhost:50051",
+			grpc::InsecureChannelCredentials())
+    );
+
+ // this should be replaced by some constructive function
+	// before that, the client should be connected to the grpc server
+
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -84,7 +166,8 @@ int main(int argc, char **argv)
 #endif
 
         // Pass the image to the SLAM system
-        SLAM.TrackMonocular(im,tframe);
+        SLAM.TrackMonocular(im,tframe); 	// this is a grpc call
+						// a new tpye of grpc call might be required to return the trajectory the previous
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -109,7 +192,7 @@ int main(int argc, char **argv)
     }
 
     // Stop all threads
-    SLAM.Shutdown();
+    SLAM.Shutdown();   // this is another grpc call
 
     // Tracking time statistics
     //sort(vTimesTrack.begin(),vTimesTrack.end());
@@ -126,7 +209,7 @@ int main(int argc, char **argv)
     cout << "mean tracking time: " << totaltime/nImages << endl;
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM(string(argv[3])+"/KeyFrameTrajectory.txt");
+    SLAM.SaveKeyFrameTrajectoryTUM(string(argv[3])+"/KeyFrameTrajectory.txt"); // this is a third grpc call
 
     return 0;
 }

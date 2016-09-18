@@ -41,11 +41,15 @@ int main(int argc, char **argv)
         return 1;
     }
 
+
     // Retrieve paths to images
     vector<string> vstrImageFilenames;
     vector<double> vTimestamps;
     string strFile = string(argv[3])+"/rgb.txt";
+    string strTime = string(argv[3])+"/time.txt";
     LoadImages(strFile, vstrImageFilenames, vTimestamps);
+    std::fstream fs;
+    fs.open(strTime, std::fstream::in | std::fstream::out | std::fstream::app);
 
     int nImages = vstrImageFilenames.size();
 
@@ -113,8 +117,11 @@ int main(int argc, char **argv)
     float totaltime = 0;
     for(int ni=0; ni<nImages; ni++)
     {
-        totaltime+=vTimesTrack[ni];
+	cout << vTimesTrack[ni] << endl;
+        fs << vTimesTrack[ni] << endl; 
+	totaltime+=vTimesTrack[ni];
     }
+    fs.close();
     cout << "-------" << endl << endl;
     cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
     cout << "mean tracking time: " << totaltime/nImages << endl;

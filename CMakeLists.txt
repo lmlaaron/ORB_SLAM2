@@ -95,3 +95,11 @@ add_executable(mono_kitti
 Examples/Monocular/mono_kitti.cc)
 target_link_libraries(mono_kitti ${PROJECT_NAME})
 
+#add_executable(mono_kitti_server
+#Examples/Monocular/mono_kitti_server.cc)
+#target_link_libraries(mono_kitti_server ${PROJECT_NAME})
+
+add_executable(mono_kitti_client
+Examples/Monocular/mono_kitti_client.cc)
+target_link_libraries(mono_kitti_client ${PROJECT_NAME})
+
