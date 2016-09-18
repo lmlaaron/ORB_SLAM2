@@ -25,6 +25,7 @@
 #include<chrono>
 #include<iomanip>
 #include <grpc++/grpc++.h>
+
 #include<opencv2/core/core.hpp>
 
 #include "mono_kitti.grpc.pb.h"
@@ -52,6 +53,7 @@ void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
 
 class OrbSLAMClient {
  public:
+<<<<<<< HEAD
   OrbSLAMClient(std::shared_ptr<Channel> channel) : stub_(OrbSLAM::NewStub(channel)) {};
   
   void NewSLAM(const string &strVocFile, const string &strSettingsFile, const mono_kitti::NewSLAMRequest_ESensor sensor, const bool bUseViewer) {
