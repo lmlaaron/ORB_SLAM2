@@ -203,6 +203,7 @@ cv::Mat System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const doub
 }
 
 cv::Mat System::TrackMonocular(const cv::Mat &im, const double &timestamp)
+//KeyFrame* System::TrackMonocular(const cv::Mat &im, const double &timestamp)
 {
     if(mSensor!=MONOCULAR)
     {
@@ -422,5 +423,4 @@ void System::SaveTrajectoryKITTI(const string &filename)
     f.close();
     cout << endl << "trajectory saved!" << endl;
 }
-
 } //namespace ORB_SLAM

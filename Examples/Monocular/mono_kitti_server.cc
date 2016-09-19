@@ -86,8 +86,8 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
 	//data_send = new char[request->im_width() * request->im_height() *request->im_channel() ];	
 	//strcpy(data_send, im.c_str());
 	cv::Mat image(request->im_height(), request->im_width(), request->im_type(), data_send);
-       	cv::imshow("ORB-SLAM2: Current Frame",image); // for debug
-        cv::waitKey(1e5/30);
+       	//cv::imshow("ORB-SLAM2: Current Frame",image); // for debug
+        //cv::waitKey(1e3/30);
 
 	cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
 	// serialize cv::mat

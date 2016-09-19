@@ -1,0 +1,7 @@
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/ORB_SLAM2.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/mono_kitti.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/mono_kitti_client.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/mono_kitti_server.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/mono_tum.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/rgbd_tum.dir
+/home/rose/dev/ORB_SLAM2_NEW/build/CMakeFiles/stereo_kitti.dir
