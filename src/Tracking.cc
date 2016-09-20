@@ -263,7 +263,8 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
     
     //mCurrentFrame.mTcw.clone();
     //return mCurrentFrame.mpReferenceKF;
-    return mCurrentFrame.mTcw.clone();
+    //return mCurrentFrame.mTcw.clone();
+    return mCurrentFrame.GetCameraCenter();
 }
 
 void Tracking::Track()

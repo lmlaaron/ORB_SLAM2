@@ -87,12 +87,12 @@ class OrbSLAMClient {
 	stub_->TrackMonocular(&context, request, &reply);
 
 	// deserialize cv::mat
+	std::string ret_im = reply.im();
+	std::vector<uchar> ret_data(ret_im.begin(), ret_im.end());
 	char *data_recv;
-	data_recv = new char[reply.im_width() * reply.im_height() * reply.im_channel()];	
-	strcpy(data_recv, reply.im().c_str());
-		
-	//cv::Mat ret(reply.im_width(), reply.im_height(), reply.im_type(), ((string) (reply.im())) );	
-	cv::Mat ret(reply.im_height(), reply.im_width(), reply.im_type(), data_recv );	
+	data_recv = new char[ret_data.size()];	
+	std::copy(ret_data.begin(), ret_data.end(), data_recv);	
+	cv::Mat ret(reply.im_height(), reply.im_width(), reply.im_type(), data_recv );
 	return ret;
   }
   void Shutdown() {
@@ -172,8 +172,10 @@ int main(int argc, char **argv)
 #endif
 
         // Pass the image to the SLAM system
-	SLAM.TrackMonocular(im,tframe); 	// this is a grpc call
+	cv::Mat ret = SLAM.TrackMonocular(im,tframe); 	// this is a grpc call
 						// a new tpye of grpc call might be required to return the trajectory the previous
+	cout << "shoot" << endl;
+	cout << setprecision(7) << " " << ret.at<float>(0) << " " << ret.at<float>(1) << " " << ret.at<float>(2) << endl;
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();

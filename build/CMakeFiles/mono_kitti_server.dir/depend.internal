@@ -33,6 +33,7 @@ CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o
  ../Thirdparty/g2o/g2o/types/types_sba.h
  ../Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h
  ../Thirdparty/g2o/g2o/types/types_six_dof_expmap.h
+ ../include/Converter.h
  ../include/Frame.h
  ../include/FrameDrawer.h
  ../include/Initializer.h

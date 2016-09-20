@@ -36,12 +36,16 @@
 #include <grpc++/security/server_credentials.h>
 
 #include"System.h"
+#include"KeyFrame.h"
+#include"Converter.h"
 #include "mono_kitti.grpc.pb.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+using ORB_SLAM2::Converter;
+using ORB_SLAM2::KeyFrame;
 using mono_kitti::OrbSLAM;
 using mono_kitti::NewSLAMRequest;
 using mono_kitti::NewSLAMReturn;
@@ -89,7 +93,14 @@ class OrbSLAMServiceImpl final : public OrbSLAM::Service {
        	//cv::imshow("ORB-SLAM2: Current Frame",image); // for debug
         //cv::waitKey(1e3/30);
 
-	cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
+	//cv::Mat ret = SLAM->TrackMonocular(image, request->timestamp()); 
+	cv::Mat ret =SLAM->TrackMonocular(image, request->timestamp());
+        	//cv::Mat R = pKF->GetRotation().t();
+        	//cv::Mat R = pKF->GetRotation();
+        	//vector<float> q = Converter::toQuaternion(R);
+        	//cv::Mat t = pKF->GetCameraCenter();
+        	//cout << setprecision(6) << pKF->mTimeStamp << " " << t.at<double>(0) << " " << t.at<double>(1) << " " << t.at<double>(2) << endl;
+        	//  << " " << q[0] << " " << q[1] << " " << q[2] << " " << q[3] << endl;
 	// serialize cv::mat
 	cv::Size size = ret.size();
 	std::vector<uchar> data(ret.ptr(), ret.ptr() + size.width * size.height* ret.channels());

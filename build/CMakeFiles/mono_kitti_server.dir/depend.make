@@ -32,6 +32,7 @@ CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../T
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../Thirdparty/g2o/g2o/types/types_sba.h
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../Thirdparty/g2o/g2o/types/types_six_dof_expmap.h
+CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../include/Converter.h
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../include/Frame.h
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../include/FrameDrawer.h
 CMakeFiles/mono_kitti_server.dir/Examples/Monocular/mono_kitti_server.cc.o: ../include/Initializer.h
